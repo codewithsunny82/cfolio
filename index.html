@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Tech Portfolio | SYS_ADMIN v2.0</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron & Share Tech Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Core Variables */
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0066ff;
+            --neon-pink: #ff0055;
+            --neon-green: #00ff66;
+            --bg-color: #030303;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Background Canvas */
+        #binary-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -3; opacity: 0.2;
+        }
+
+        /* Hex Grid Background Detailing */
+        .hex-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: radial-gradient(var(--neon-cyan) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.03;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* CRT Scanlines & TV Noise */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 99990; pointer-events: none; opacity: 0.4;
+        }
+
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.04; z-index: 99991; pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(8, 8, 8, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 10px; height: 10px;
+            border-top: 2px solid var(--neon-cyan); border-left: 2px solid var(--neon-cyan); opacity: 0; transition: 0.3s;
+        }
+        .glass-panel::after {
+            content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
+            border-bottom: 2px solid var(--neon-cyan); border-right: 2px solid var(--neon-cyan); opacity: 0; transition: 0.3s;
+        }
+        .glass-panel:hover::before, .glass-panel:hover::after { opacity: 1; width: 20px; height: 20px; }
+        
+        .glass-panel:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .neon-text { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan); }
+        .neon-text-pink { color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink); }
+
+        .neon-btn {
+            position: relative; background: transparent; color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+            transition: 0.3s; overflow: hidden; z-index: 1;
+        }
+        .neon-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.4), transparent);
+            transition: all 0.5s ease; z-index: -1;
+        }
+        .neon-btn:hover::before { left: 100%; }
+        .neon-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 15px var(--neon-cyan);
+        }
+
+        /* Enhanced Profile Photo */
+        .profile-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto; }
+        .profile-container {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 220px; height: 220px; border-radius: 50%;
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4), inset 0 0 20px rgba(0, 243, 255, 0.4);
+            overflow: hidden; cursor: pointer; transition: 0.3s; z-index: 10;
+        }
+        
+        /* Rotating Tech Rings around profile */
+        .tech-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; border: 1px dashed rgba(0, 243, 255, 0.5);
+            animation: spin 10s linear infinite; pointer-events: none;
+        }
+        .tech-ring-2 {
+            position: absolute; top: 5%; left: 5%; width: 90%; height: 90%;
+            border-radius: 50%; border: 2px dotted rgba(255, 0, 85, 0.4);
+            animation: spin-reverse 15s linear infinite; pointer-events: none;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+
+        .profile-container:hover { box-shadow: 0 0 40px var(--neon-cyan), inset 0 0 40px var(--neon-cyan); border-color: #fff; }
+        .profile-pic { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: grayscale(20%) contrast(110%); }
+        .profile-container:hover .profile-pic { transform: scale(1.1); filter: grayscale(0%) contrast(120%); }
+
+        .upload-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 35%;
+            background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
+            color: var(--neon-cyan); transform: translateY(100%); transition: 0.3s;
+            font-size: 1rem; border-top: 1px solid var(--neon-cyan); flex-direction: column;
+        }
+        .profile-container:hover .upload-overlay { transform: translateY(0); }
+
+        /* Typing cursor */
+        .typing-cursor { display: inline-block; width: 10px; height: 24px; background-color: var(--neon-cyan); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; border-left: 1px solid #111; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 0; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
+
+        /* Custom Glowing Cursor */
+        @media (pointer: fine) { body { cursor: none; } }
+        .cursor-dot {
+            width: 4px; height: 4px; background: var(--neon-cyan); position: fixed; border-radius: 50%; pointer-events: none; z-index: 100000; transform: translate(-50%, -50%); box-shadow: 0 0 10px var(--neon-cyan); transition: width 0.2s, height 0.2s;
+        }
+        .cursor-outline {
+            width: 30px; height: 30px; border: 1px solid rgba(0, 243, 255, 0.4); position: fixed; border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%, -50%); transition: 0.1s ease-out; box-shadow: inset 0 0 5px rgba(0, 243, 255, 0.2);
+        }
+        .hover-target:hover ~ .cursor-dot, a:hover ~ .cursor-dot, button:hover ~ .cursor-dot, input:hover ~ .cursor-dot, textarea:hover ~ .cursor-dot {
+            width: 12px; height: 12px; background: white; box-shadow: 0 0 15px white;
+        }
+        .hover-target:hover ~ .cursor-outline, a:hover ~ .cursor-outline, button:hover ~ .cursor-outline {
+            width: 40px; height: 40px; border-color: white; border-style: dashed; animation: spin 4s linear infinite;
+        }
+
+        /* Glitch Text */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { position: relative; z-index: 1; }
+        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: -1; pointer-events: none; }
+        .glitch::before { left: 2px; text-shadow: -2px 0 var(--neon-pink); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
+        .glitch::after { left: -2px; text-shadow: -2px 0 var(--neon-cyan); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 3s infinite linear alternate-reverse; }
+        @keyframes glitch-anim { 0% { clip: rect(10px, 9999px, 31px, 0); } 5% { clip: rect(70px, 9999px, 71px, 0); } 10% { clip: rect(31px, 9999px, 91px, 0); } 100% { clip: rect(10px, 9999px, 31px, 0); } }
+        @keyframes glitch-anim2 { 0% { clip: rect(65px, 9999px, 100px, 0); } 5% { clip: rect(5px, 9999px, 30px, 0); } 100% { clip: rect(65px, 9999px, 100px, 0); } }
+
+        /* Scroll Reveal Animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Tilt Card Container */
+        .tilt-card { transform-style: preserve-3d; transform: perspective(1000px); }
+        .tilt-card-content { transform: translateZ(30px); }
+
+        /* Radar Sweep */
+        @keyframes radar-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .radar-sweep { position: absolute; top: 50%; left: 50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent 70%, rgba(0, 243, 255, 0.4) 100%); transform-origin: 0 0; animation: radar-spin 3s linear infinite; z-index: 0; pointer-events: none; }
+
+        .animate-float { animation: float 5s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+
+        input:focus, textarea:focus { box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 5px rgba(0, 243, 255, 0.1) !important; border-color: var(--neon-cyan) !important; }
+
+        /* Boot Screen */
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #020202; z-index: 999999; display: flex; flex-direction: column; justify-content: center; padding: 2rem; }
+        
+        /* NEW: Action Logger Terminal */
+        #action-logger {
+            position: fixed; bottom: 20px; left: 20px; width: 300px; height: 150px;
+            background: rgba(0,0,0,0.8); border: 1px solid rgba(0, 243, 255, 0.3);
+            border-top: 15px solid rgba(0, 243, 255, 0.2); z-index: 90000;
+            font-size: 0.65rem; padding: 5px 10px; overflow-y: hidden;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            backdrop-filter: blur(5px); box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: opacity 0.3s;
+        }
+        #action-logger::before {
+            content: 'SYS_LOG_MONITOR'; position: absolute; top: -13px; left: 5px;
+            color: var(--neon-cyan); font-size: 0.55rem; font-family: 'Orbitron', sans-serif;
+        }
+        .log-entry { margin-bottom: 2px; opacity: 0.8; animation: slideIn 0.2s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0;} to { transform: translateX(0); opacity: 0.8;} }
+
+        /* Mobile Menu */
+        #mobile-menu { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        #mobile-menu.active { max-height: 300px; opacity: 1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Noise & Scanline Overlays -->
+    <div class="noise-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="hex-bg"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <!-- System Boot Screen -->
+    <div id="boot-screen">
+        <div class="max-w-4xl w-full mx-auto md:text-xl text-cyan-400 font-mono">
+            <div class="flex items-center gap-3 mb-4 text-sm text-gray-500">
+                <i class="fas fa-terminal"></i>
+                <span>SYS_OS v2.0 - KERNEL BOOT</span>
+            </div>
+            <div id="boot-text" class="whitespace-pre-wrap leading-relaxed"></div>
+            <!-- Boot Progress Bar -->
+            <div id="boot-progress" class="mt-4 hidden items-center gap-2 text-xs">
+                <span>[</span>
+                <div class="w-64 h-2 bg-gray-900 border border-gray-700">
+                    <div id="boot-bar" class="h-full bg-cyan-400 w-0" style="box-shadow: 0 0 10px #00f3ff;"></div>
+                </div>
+                <span>] <span id="boot-pct">0</span>%</span>
+            </div>
+            <div class="mt-2 inline-block w-3 h-5 bg-cyan-400 animate-pulse"></div>
+        </div>
+    </div>
+
+    <!-- Live Action Logger (Mini Terminal) - Visible only on Desktop -->
+    <div id="action-logger" class="hidden md:flex">
+        <div id="log-container" class="w-full text-cyan-300 font-mono">
+            <div class="log-entry">> Initializing monitoring node...</div>
+            <div class="log-entry">> Awaiting user input...</div>
+        </div>
+    </div>
+
+    <!-- Background Binary Canvas -->
+    <canvas id="binary-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed w-full z-50 glass-panel border-t-0 border-l-0 border-r-0 border-b bg-opacity-90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 brand-font text-2xl font-bold neon-text cursor-pointer hover:scale-105 transition-transform track-hover" data-log="Navigated to Root Directory" onclick="window.scrollTo(0,0)">
+                    SYS_ADMIN<span class="text-white text-shadow-none animate-pulse">_</span>
+                </div>
+                
+                <!-- Live System Clock & Status (Desktop) -->
+                <div class="hidden lg:flex items-center gap-4 bg-black bg-opacity-50 px-4 py-1 rounded border border-cyan-900">
+                    <div class="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>
+                    <span class="text-xs text-red-400 font-bold tracking-widest mr-2">REC</span>
+                    <i class="fas fa-satellite-dish text-cyan-500 text-xs mr-1"></i>
+                    <span id="sys-clock" class="text-cyan-400 text-sm tracking-widest font-bold">00:00:00</span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-6 lg:space-x-8 text-sm font-bold tracking-wide">
+                        <a href="#home" class="nav-link track-hover hover:text-cyan-400 hover:shadow-[0_4px_0_-2px_#00f3ff] transition duration-300 pb-1" data-log="Scanning module: HOME">01. Home</a>
+                        <a href="#about" class="nav-link track-hover hover:text-cyan-400 hover:shadow-[0_4px_0_-2px_#00f3ff] transition duration-300 pb-1" data-log="Scanning module: ABOUT">02. About</a>
+                        <a href="#experience" class="nav-link track-hover hover:text-cyan-400 hover:shadow-[0_4px_0_-2px_#00f3ff] transition duration-300 pb-1" data-log="Scanning module: EXPERIENCE">03. Experience</a>
+                        <a href="#projects" class="nav-link track-hover hover:text-cyan-400 hover:shadow-[0_4px_0_-2px_#00f3ff] transition duration-300 pb-1" data-log="Scanning module: PROJECTS">04. Projects</a>
+                        <a href="#contact" class="nav-link track-hover px-3 py-1 border border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black transition duration-300 rounded" data-log="Initiating Contact Protocol">Connect</a>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-cyan-400 hover:text-white focus:outline-none p-2 border border-cyan-800 rounded bg-black">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="md:hidden bg-black bg-opacity-95 border-b border-cyan-800 absolute w-full left-0 z-40">
+            <div class="px-4 pt-2 pb-6 space-y-2 text-center text-sm font-bold tracking-widest brand-font">
+                <a href="#home" class="block px-3 py-3 text-gray-300 hover:text-cyan-400 hover:bg-gray-900 border-b border-gray-800">01_HOME</a>
+                <a href="#about" class="block px-3 py-3 text-gray-300 hover:text-cyan-400 hover:bg-gray-900 border-b border-gray-800">02_ABOUT</a>
+                <a href="#experience" class="block px-3 py-3 text-gray-300 hover:text-cyan-400 hover:bg-gray-900 border-b border-gray-800">03_LOGS</a>
+                <a href="#projects" class="block px-3 py-3 text-gray-300 hover:text-cyan-400 hover:bg-gray-900 border-b border-gray-800">04_ARCHIVES</a>
+                <a href="#contact" class="block px-3 py-3 mt-4 text-black bg-cyan-500 hover:bg-cyan-400 rounded">CONNECT</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Social Sidebar -->
+    <div class="hidden md:flex flex-col gap-4 fixed right-6 top-1/2 transform -translate-y-1/2 z-40">
+        <div class="h-16 w-px bg-cyan-800 mx-auto mb-2"></div>
+        <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all track-hover" data-log="Ping: GitHub Server" title="GitHub"><i class="fab fa-github text-xl"></i></a>
+        <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all track-hover" data-log="Ping: LinkedIn Network" title="LinkedIn"><i class="fab fa-linkedin-in text-xl"></i></a>
+        <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 hover:scale-110 transition-all track-hover" data-log="Ping: X/Twitter Protocol" title="Twitter/X"><i class="fab fa-twitter text-xl"></i></a>
+        <div class="h-16 w-px bg-cyan-800 mx-auto mt-2"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center pt-20 px-4 relative scroll-section">
+        <div class="text-center z-10 w-full max-w-4xl">
+            
+            <!-- Enhanced Profile Picture -->
+            <div class="profile-wrapper mb-8 animate-float">
+                <div class="tech-ring"></div>
+                <div class="tech-ring-2"></div>
+                
+                <!-- Hidden file input -->
+                <input type="file" id="profile-upload" class="hidden" accept="image/*">
+                
+                <div class="profile-container track-hover" data-log="Target selected: User Avatar" onclick="document.getElementById('profile-upload').click()">
+                    <!-- Default image -->
+                    <img id="profile-pic" src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?q=80&w=500&auto=format&fit=crop" alt="Profile" class="profile-pic">
+                    <div class="upload-overlay brand-font">
+                        <i class="fas fa-cloud-upload-alt mb-1"></i>
+                        <span class="text-xs tracking-widest">INJECT AVATAR</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Glitch Title -->
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 brand-font tracking-wider glitch-wrapper">
+                <span class="glitch" data-text="HI, MAIN CODER HOON">HI, MAIN <span class="neon-text">CODER</span> HOON</span>
+            </h1>
+            
+            <!-- Enhanced Typing Area -->
+            <div class="text-xl md:text-3xl text-gray-300 mb-8 h-12 font-bold bg-black bg-opacity-60 inline-flex items-center px-6 py-2 border border-cyan-900 rounded-sm shadow-[0_0_15px_rgba(0,243,255,0.1)] relative">
+                <div class="absolute -left-1 w-2 h-full bg-cyan-500 opacity-50"></div>
+                <span class="text-green-500 mr-3 text-lg">> root@sys:~$</span>
+                <span id="typing-text" class="text-cyan-100"></span><span class="typing-cursor"></span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <a href="#projects" class="neon-btn px-8 py-3 uppercase font-bold tracking-widest text-sm brand-font track-hover" data-log="Command: Execute Data Access">
+                    <i class="fas fa-folder-open mr-2"></i> Data Access
+                </a>
+                <a href="#" class="px-8 py-3 uppercase font-bold tracking-widest text-sm brand-font border border-cyan-800 text-cyan-300 hover:bg-cyan-900 hover:text-white transition duration-300 group track-hover glass-panel" data-log="Command: Download Payload">
+                    <i class="fas fa-download mr-2 group-hover:text-cyan-400 group-hover:animate-bounce"></i> Resume.pdf
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll down indicator -->
+        <a href="#about" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-cyan-800 animate-bounce hover:text-cyan-400 transition cursor-pointer">
+            <div class="flex flex-col items-center text-xs font-mono tracking-widest mb-1">SCROLL</div>
+            <i class="fas fa-chevron-down text-xl"></i>
+        </a>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 z-10 relative reveal scroll-section">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-center gap-4 mb-16">
+                <div class="h-px w-8 md:w-24 bg-gradient-to-l from-cyan-500 to-transparent"></div>
+                <h2 class="text-3xl md:text-4xl font-bold text-center brand-font neon-text tracking-widest">_ABOUT_ME.exe</h2>
+                <div class="h-px w-8 md:w-24 bg-gradient-to-r from-cyan-500 to-transparent"></div>
+            </div>
+            
+            <div class="glass-panel p-6 md:p-10 rounded-sm md:flex items-center gap-12 relative overflow-hidden">
+                <!-- Tech Brackets -->
+                <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-600 opacity-50"></div>
+                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-600 opacity-50"></div>
+
+                <div class="md:w-5/12 mb-10 md:mb-0 relative">
+                    <!-- Tech graphic with Radar Scanner -->
+                    <div class="w-full aspect-square max-h-80 border border-cyan-800 rounded bg-black flex items-center justify-center overflow-hidden relative group track-hover" data-log="Scanning Biological Entity Details">
+                        <div class="absolute inset-0 bg-[linear-gradient(rgba(0,243,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.1)_1px,transparent_1px)] bg-[size:15px_15px]"></div>
+                        
+                        <!-- Radar Elements -->
+                        <div class="absolute w-[80%] h-[80%] border border-cyan-900 rounded-full opacity-60"></div>
+                        <div class="absolute w-[60%] h-[60%] border border-dashed border-cyan-700 rounded-full opacity-60 animate-[spin_20s_linear_infinite]"></div>
+                        <div class="absolute w-[40%] h-[40%] border border-cyan-800 rounded-full opacity-60"></div>
+                        
+                        <!-- Crosshairs -->
+                        <div class="absolute w-full h-px bg-cyan-900 opacity-50"></div>
+                        <div class="absolute h-full w-px bg-cyan-900 opacity-50"></div>
+
+                        <div class="radar-sweep"></div>
+                        
+                        <div class="relative z-10 bg-black bg-opacity-50 p-6 rounded-full border border-cyan-500 shadow-[0_0_20px_rgba(0,243,255,0.3)] backdrop-blur-sm">
+                            <i class="fas fa-user-astronaut text-6xl text-cyan-400 group-hover:text-white transition duration-500"></i>
+                        </div>
+                        
+                        <div class="absolute top-3 left-3 text-[10px] text-cyan-500 font-mono">TARGET_LOCKED</div>
+                        <div class="absolute bottom-3 right-3 text-[10px] text-cyan-500 font-mono flex items-center gap-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> SYS.CORE.READY
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:w-7/12 relative z-10">
+                    <h3 class="text-2xl brand-font mb-4 text-white flex items-center bg-cyan-900 bg-opacity-30 inline-block px-4 py-1 border-l-4 border-cyan-400">
+                        <i class="fas fa-terminal text-sm mr-3 text-cyan-500"></i> Identity_Profile
+                    </h3>
+                    
+                    <div class="text-sm text-gray-300 leading-relaxed space-y-4 mb-6 border-l border-cyan-900 pl-4 py-2">
+                        <p>
+                            Hello! Main ek passionate full-stack developer hoon jo high-performance applications aur futuristic UIs banane mein expert hai. Mera code clean, optimized aur scalable hota hai.
+                        </p>
+                        <p>
+                            Frontend se lekar backend tak, mujhe complex problems ko solve karna aur unhe visually stunning experiences mein convert karna pasand hai. <span class="text-cyan-400 font-bold">Let's build the future together.</span>
+                        </p>
+                    </div>
+
+                    <!-- Cyber Details -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mb-8 font-mono">
+                        <div class="bg-black bg-opacity-60 p-3 border border-gray-800 hover:border-cyan-800 transition flex justify-between track-hover" data-log="Reading Detail: CLASS">
+                            <span class="text-gray-500">CLASS:</span><span class="text-cyan-300 font-bold">Full-Stack Tech</span>
+                        </div>
+                        <div class="bg-black bg-opacity-60 p-3 border border-gray-800 hover:border-cyan-800 transition flex justify-between track-hover" data-log="Reading Detail: LEVEL">
+                            <span class="text-gray-500">LEVEL:</span><span class="text-cyan-300 font-bold">Senior (5+ Yrs)</span>
+                        </div>
+                        <div class="bg-black bg-opacity-60 p-3 border border-gray-800 hover:border-cyan-800 transition flex justify-between track-hover" data-log="Reading Detail: BASE">
+                            <span class="text-gray-500">BASE:</span><span class="text-cyan-300 font-bold">Cyberspace / India</span>
+                        </div>
+                        <div class="bg-black bg-opacity-60 p-3 border border-gray-800 hover:border-cyan-800 transition flex justify-between track-hover" data-log="Reading Detail: STATUS">
+                            <span class="text-gray-500">STATUS:</span><span class="text-green-400 font-bold animate-pulse">Online</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats/Counters Section -->
+    <section id="stats" class="py-12 px-4 z-10 relative bg-black bg-opacity-90 border-y border-cyan-900 reveal scroll-section">
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
+        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            
+            <div class="p-6 relative group border border-gray-900 hover:border-cyan-800 transition bg-black">
+                <div class="absolute top-0 right-0 w-8 h-8 bg-cyan-900 bg-opacity-20 rounded-bl-full"></div>
+                <i class="fas fa-code text-2xl text-cyan-700 mb-3 group-hover:text-cyan-400 transition"></i>
+                <h4 class="text-3xl font-bold brand-font text-white mb-1 counter" data-target="50000">0</h4>
+                <p class="text-gray-500 text-[10px] tracking-[0.2em] font-bold">LINES OF CODE</p>
+            </div>
+            
+            <div class="p-6 relative group border border-gray-900 hover:border-cyan-800 transition bg-black">
+                <div class="absolute top-0 right-0 w-8 h-8 bg-cyan-900 bg-opacity-20 rounded-bl-full"></div>
+                <i class="fas fa-project-diagram text-2xl text-cyan-700 mb-3 group-hover:text-cyan-400 transition"></i>
+                <h4 class="text-3xl font-bold brand-font text-white mb-1"><span class="counter" data-target="42">0</span>+</h4>
+                <p class="text-gray-500 text-[10px] tracking-[0.2em] font-bold">PROJECTS DEPLOYED</p>
+            </div>
+
+            <div class="p-6 relative group border border-gray-900 hover:border-cyan-800 transition bg-black">
+                <div class="absolute top-0 right-0 w-8 h-8 bg-cyan-900 bg-opacity-20 rounded-bl-full"></div>
+                <i class="fas fa-mug-hot text-2xl text-cyan-700 mb-3 group-hover:text-cyan-400 transition"></i>
+                <h4 class="text-3xl font-bold brand-font text-white mb-1 counter" data-target="1337">0</h4>
+                <p class="text-gray-500 text-[10px] tracking-[0.2em] font-bold">COFFEE CUPS</p>
+            </div>
+
+            <div class="p-6 relative group border border-gray-900 hover:border-cyan-800 transition bg-black">
+                <div class="absolute top-0 right-0 w-8 h-8 bg-cyan-900 bg-opacity-20 rounded-bl-full"></div>
+                <i class="fas fa-shield-alt text-2xl text-cyan-700 mb-3 group-hover:text-cyan-400 transition"></i>
+                <h4 class="text-3xl font-bold brand-font text-white mb-1"><span class="counter" data-target="99">0</span>%</h4>
+                <p class="text-gray-500 text-[10px] tracking-[0.2em] font-bold">UPTIME RATING</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Experience Timeline Section -->
+    <section id="experience" class="py-20 px-4 z-10 relative reveal scroll-section">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-center gap-4 mb-16">
+                <i class="fas fa-history text-cyan-500 text-xl"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-center brand-font neon-text tracking-widest">_TIMELINE_LOGS</h2>
+            </div>
+            
+            <div class="relative border-l border-cyan-800 ml-4 md:ml-10">
+                
+                <!-- Log 1 -->
+                <div class="mb-12 ml-8 glass-panel p-6 border-l-4 border-l-cyan-500 relative group hover:bg-cyan-900 hover:bg-opacity-10 track-hover" data-log="Viewing Log: NEXUS CORP">
+                    <div class="absolute -left-[42px] top-5 w-4 h-4 bg-black border-2 border-cyan-500 rounded-full group-hover:bg-cyan-500 group-hover:scale-125 transition-all duration-300 shadow-[0_0_10px_#00f3ff]"></div>
+                    <div class="absolute -left-8 top-6 w-8 h-px bg-cyan-800 group-hover:bg-cyan-400 transition-colors"></div>
+                    
+                    <div class="absolute right-4 top-4 text-cyan-900 opacity-30 text-5xl group-hover:text-cyan-500 group-hover:opacity-10 transition duration-500"><i class="fas fa-briefcase"></i></div>
+                    
+                    <h3 class="text-xl md:text-2xl font-bold brand-font text-white mb-1 group-hover:text-cyan-300 transition">Lead Cyber Developer</h3>
+                    <h4 class="text-cyan-400 text-xs font-bold mb-4 tracking-widest uppercase">NEXUS CORP <span class="text-gray-600 mx-2">|</span> 2023 - PRESENT</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed relative z-10">System architecture design, neural network integration, and leading a squad of 5 elite coders to build secure quantum-ready web platforms. Optimization resulted in 60% faster data retrieval.</p>
+                </div>
+
+                <!-- Log 2 -->
+                <div class="mb-12 ml-8 glass-panel p-6 border-l-4 border-l-cyan-700 relative group hover:bg-cyan-900 hover:bg-opacity-10 track-hover" data-log="Viewing Log: SYNTAX DYNAMICS">
+                    <div class="absolute -left-[42px] top-5 w-4 h-4 bg-black border-2 border-cyan-700 rounded-full group-hover:border-cyan-500 transition-all duration-300"></div>
+                    <div class="absolute -left-8 top-6 w-8 h-px bg-cyan-900"></div>
+                    
+                    <h3 class="text-xl md:text-2xl font-bold brand-font text-gray-200 mb-1 group-hover:text-cyan-300 transition">Full-Stack Engineer</h3>
+                    <h4 class="text-cyan-600 text-xs font-bold mb-4 tracking-widest uppercase">SYNTAX DYNAMICS <span class="text-gray-600 mx-2">|</span> 2020 - 2023</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed">Developed high-performance REST APIs, real-time data visualizers, and optimized database queries reducing load time by 40%. Implemented advanced WebSocket protocols for live data feeds.</p>
+                </div>
+
+                <!-- Log 3 -->
+                <div class="mb-0 ml-8 glass-panel p-6 border-l-4 border-l-cyan-900 relative group hover:bg-cyan-900 hover:bg-opacity-10 track-hover" data-log="Viewing Log: INITIATIVE ZERO">
+                    <div class="absolute -left-[42px] top-5 w-4 h-4 bg-black border-2 border-cyan-900 rounded-full group-hover:border-cyan-500 transition-all duration-300"></div>
+                    <div class="absolute -left-8 top-6 w-8 h-px bg-gray-800"></div>
+                    
+                    <h3 class="text-xl md:text-2xl font-bold brand-font text-gray-400 mb-1 group-hover:text-cyan-300 transition">Junior Web Developer</h3>
+                    <h4 class="text-gray-500 text-xs font-bold mb-4 tracking-widest uppercase">INITIATIVE ZERO <span class="text-gray-600 mx-2">|</span> 2018 - 2020</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed">Started journey by building responsive UIs, debugging legacy codebase, and mastering the fundamentals of JavaScript and CSS. Assisted in migrating old monolithic architecture to microservices.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 px-4 z-10 relative bg-black bg-opacity-70 reveal border-y border-gray-900 scroll-section">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-16 text-center brand-font text-white">
+                <span class="text-cyan-500">{"</span> SKILL_MATRIX <span class="text-cyan-500">"}</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Skill 1 -->
+                <div class="glass-panel p-5 relative overflow-hidden group track-hover" data-log="Analyzing Skill: Frontend Tech">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[rgba(0,243,255,0.05)] to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="flex justify-between mb-3 relative z-10">
+                        <span class="font-bold text-sm tracking-widest flex items-center"><i class="fab fa-html5 text-orange-500 mr-3 text-lg"></i> HTML/CSS/Tailwind</span>
+                        <span class="text-cyan-400 font-mono text-sm">95%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-full bg-gray-900 h-1.5 relative overflow-hidden rounded-full">
+                            <div class="absolute top-0 left-0 h-full bg-cyan-500 shadow-[0_0_10px_#00f3ff]" style="width: 95%;"></div>
+                            <!-- Data stream effect -->
+                            <div class="absolute top-0 left-0 h-full w-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4yIi8+PC9zdmc+')] opacity-50"></div>
+                        </div>
+                        <div class="text-[9px] text-gray-500 font-mono animate-pulse">RUNNING</div>
+                    </div>
+                </div>
+
+                <!-- Skill 2 -->
+                <div class="glass-panel p-5 relative overflow-hidden group track-hover" data-log="Analyzing Skill: JavaScript/ES6">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[rgba(0,243,255,0.05)] to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="flex justify-between mb-3 relative z-10">
+                        <span class="font-bold text-sm tracking-widest flex items-center"><i class="fab fa-js text-yellow-400 mr-3 text-lg"></i> JavaScript / TS</span>
+                        <span class="text-cyan-400 font-mono text-sm">90%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-full bg-gray-900 h-1.5 relative overflow-hidden rounded-full">
+                            <div class="absolute top-0 left-0 h-full bg-cyan-500 shadow-[0_0_10px_#00f3ff]" style="width: 90%;"></div>
+                        </div>
+                        <div class="text-[9px] text-gray-500 font-mono animate-pulse">RUNNING</div>
+                    </div>
+                </div>
+
+                <!-- Skill 3 -->
+                <div class="glass-panel p-5 relative overflow-hidden group track-hover" data-log="Analyzing Skill: React Frameworks">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[rgba(0,243,255,0.05)] to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="flex justify-between mb-3 relative z-10">
+                        <span class="font-bold text-sm tracking-widest flex items-center"><i class="fab fa-react text-blue-400 mr-3 text-lg"></i> React / Next.js</span>
+                        <span class="text-cyan-400 font-mono text-sm">85%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-full bg-gray-900 h-1.5 relative overflow-hidden rounded-full">
+                            <div class="absolute top-0 left-0 h-full bg-cyan-500 shadow-[0_0_10px_#00f3ff]" style="width: 85%;"></div>
+                        </div>
+                        <div class="text-[9px] text-gray-500 font-mono animate-pulse">RUNNING</div>
+                    </div>
+                </div>
+
+                <!-- Skill 4 -->
+                <div class="glass-panel p-5 relative overflow-hidden group track-hover" data-log="Analyzing Skill: Backend Services">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[rgba(0,243,255,0.05)] to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="flex justify-between mb-3 relative z-10">
+                        <span class="font-bold text-sm tracking-widest flex items-center"><i class="fab fa-node text-green-500 mr-3 text-lg"></i> Node.js / Python</span>
+                        <span class="text-cyan-400 font-mono text-sm">80%</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-full bg-gray-900 h-1.5 relative overflow-hidden rounded-full">
+                            <div class="absolute top-0 left-0 h-full bg-cyan-500 shadow-[0_0_10px_#00f3ff]" style="width: 80%;"></div>
+                        </div>
+                        <div class="text-[9px] text-gray-500 font-mono animate-pulse">RUNNING</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-4 z-10 relative reveal scroll-section">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-center brand-font neon-text tracking-widest">_SYSTEM_ARCHIVES</h2>
+            <p class="text-center text-gray-500 text-xs font-mono mb-12">DECRYPTING VISUAL DATA PACKETS...</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- Project Card 1 -->
+                <div class="glass-panel overflow-hidden group tilt-card border border-gray-800 hover:border-cyan-500 track-hover" data-log="Loading Asset: Neural UI Project">
+                    <div class="h-48 bg-gray-900 border-b border-gray-800 flex justify-center items-center relative overflow-hidden tilt-card-content">
+                        <!-- Scanning line effect on hover -->
+                        <div class="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_10px_#00f3ff] z-30 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_linear_infinite]"></div>
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-90 group-hover:opacity-60 transition"></div>
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=500&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:opacity-100 transition duration-700 group-hover:scale-110"></div>
+                        
+                        <!-- Overlay overlay on hover -->
+                        <div class="absolute inset-0 bg-cyan-900 bg-opacity-20 opacity-0 group-hover:opacity-100 z-20 transition backdrop-blur-[1px] flex justify-center items-center">
+                            <button class="neon-btn px-4 py-2 text-xs brand-font font-bold">INITIATE HACK</button>
+                        </div>
+                        
+                        <div class="z-20 bg-black bg-opacity-80 px-3 py-1 rounded text-cyan-500 text-xs font-bold border border-cyan-900 font-mono absolute top-3 right-3 group-hover:opacity-0 transition">PROJ_01</div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <h3 class="text-lg font-bold mb-2 brand-font text-white group-hover:text-cyan-400 transition">Neural Network UI</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-5 h-12">Ek advanced dashboard banaya AI data visualize karne ke liye with interactive 3D charts and real-time processing indicators.</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-800">
+                            <div class="flex gap-2">
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">React</span>
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">Three.js</span>
+                            </div>
+                            <a href="#" class="text-gray-500 hover:text-cyan-400 transition text-sm" title="View Source"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="glass-panel overflow-hidden group tilt-card border border-gray-800 hover:border-cyan-500 track-hover" data-log="Loading Asset: Crypto Tracker">
+                    <div class="h-48 bg-gray-900 border-b border-gray-800 flex justify-center items-center relative overflow-hidden tilt-card-content">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_10px_#00f3ff] z-30 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_linear_infinite]"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-90 group-hover:opacity-60 transition"></div>
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=500&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:opacity-100 transition duration-700 group-hover:scale-110"></div>
+                        <div class="absolute inset-0 bg-cyan-900 bg-opacity-20 opacity-0 group-hover:opacity-100 z-20 transition backdrop-blur-[1px] flex justify-center items-center">
+                            <button class="neon-btn px-4 py-2 text-xs brand-font font-bold">INITIATE HACK</button>
+                        </div>
+                        <div class="z-20 bg-black bg-opacity-80 px-3 py-1 rounded text-cyan-500 text-xs font-bold border border-cyan-900 font-mono absolute top-3 right-3 group-hover:opacity-0 transition">PROJ_02</div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <h3 class="text-lg font-bold mb-2 brand-font text-white group-hover:text-cyan-400 transition">Crypto Tracker App</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-5 h-12">Live cryptocurrency rates aur market analysis track karne wali web application utilizing WebSockets for zero latency.</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-800">
+                            <div class="flex gap-2">
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">Vue.js</span>
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">REST API</span>
+                            </div>
+                            <a href="#" class="text-gray-500 hover:text-cyan-400 transition text-sm" title="View Source"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="glass-panel overflow-hidden group tilt-card border border-gray-800 hover:border-cyan-500 track-hover" data-log="Loading Asset: Cyber Blog">
+                    <div class="h-48 bg-gray-900 border-b border-gray-800 flex justify-center items-center relative overflow-hidden tilt-card-content">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_10px_#00f3ff] z-30 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_linear_infinite]"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent z-10 opacity-90 group-hover:opacity-60 transition"></div>
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618044733300-9472054094ee?q=80&w=500&auto=format&fit=crop')] bg-cover bg-center opacity-40 group-hover:opacity-100 transition duration-700 group-hover:scale-110"></div>
+                        <div class="absolute inset-0 bg-cyan-900 bg-opacity-20 opacity-0 group-hover:opacity-100 z-20 transition backdrop-blur-[1px] flex justify-center items-center">
+                            <button class="neon-btn px-4 py-2 text-xs brand-font font-bold">INITIATE HACK</button>
+                        </div>
+                        <div class="z-20 bg-black bg-opacity-80 px-3 py-1 rounded text-cyan-500 text-xs font-bold border border-cyan-900 font-mono absolute top-3 right-3 group-hover:opacity-0 transition">PROJ_03</div>
+                    </div>
+                    <div class="p-6 relative z-10">
+                        <h3 class="text-lg font-bold mb-2 brand-font text-white group-hover:text-cyan-400 transition">Cyber Security Blog</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-5 h-12">High-tech theme wala headless CMS blog platform jisme security concepts aur vulnerability reports share kiye jate hain.</p>
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-800">
+                            <div class="flex gap-2">
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">Next.js</span>
+                                <span class="text-[10px] bg-gray-900 text-cyan-500 px-2 py-1 rounded border border-cyan-900">Tailwind</span>
+                            </div>
+                            <a href="#" class="text-gray-500 hover:text-cyan-400 transition text-sm" title="View Source"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="text-center mt-12 track-hover" data-log="Awaiting command to fetch more archives...">
+                <a href="#" class="inline-block text-cyan-700 hover:text-cyan-400 border-b border-dashed border-cyan-800 hover:border-cyan-400 pb-1 transition-colors font-mono text-xs tracking-widest">
+                    > LOAD_MORE_ARCHIVES()
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scanning Animation for Cards -->
+    <style>
+        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+    </style>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 px-4 z-10 relative bg-black bg-opacity-80 reveal scroll-section">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col items-center justify-center gap-2 mb-12">
+                <i class="fas fa-satellite-dish text-cyan-500 text-3xl animate-pulse mb-2"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-center brand-font neon-text tracking-widest">_ESTABLISH_CONNECTION</h2>
+                <p class="text-gray-500 text-xs font-mono">SECURE ENCRYPTED CHANNEL</p>
+            </div>
+            
+            <form class="glass-panel p-8 rounded-sm relative overflow-hidden track-hover" data-log="Opening Secure Transmission Interface" onsubmit="event.preventDefault(); sysLogger.log('ENCRYPTING PAYLOAD...', 'warn'); setTimeout(()=> { sysLogger.log('MESSAGE SENT SUCCESSFULLY.', 'success'); alert('Message Encrypted & Sent Successfully!'); this.reset(); }, 1500);">
+                <!-- Radar grid inside form -->
+                <div class="absolute inset-0 bg-[linear-gradient(rgba(0,243,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 relative z-10">
+                    <div class="group">
+                        <label class="block text-cyan-600 text-xs font-bold mb-2 brand-font group-focus-within:text-cyan-400 transition tracking-widest">USER_ID <span class="text-gray-700 font-mono font-normal">// Name</span></label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-3.5 text-gray-600 group-focus-within:text-cyan-400 transition"></i>
+                            <input type="text" required class="w-full pl-10 bg-black border border-gray-800 rounded-sm py-3 px-4 text-white focus:outline-none transition font-mono text-sm track-hover" data-log="Input focus: USER_ID">
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-cyan-600 text-xs font-bold mb-2 brand-font group-focus-within:text-cyan-400 transition tracking-widest">PING_ADDRESS <span class="text-gray-700 font-mono font-normal">// Email</span></label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-3.5 text-gray-600 group-focus-within:text-cyan-400 transition"></i>
+                            <input type="email" required class="w-full pl-10 bg-black border border-gray-800 rounded-sm py-3 px-4 text-white focus:outline-none transition font-mono text-sm track-hover" data-log="Input focus: PING_ADDRESS">
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-8 group relative z-10">
+                    <label class="block text-cyan-600 text-xs font-bold mb-2 brand-font group-focus-within:text-cyan-400 transition tracking-widest">DATA_PACKET <span class="text-gray-700 font-mono font-normal">// Message</span></label>
+                    <textarea rows="4" required class="w-full bg-black border border-gray-800 rounded-sm py-3 px-4 text-white focus:outline-none transition font-mono text-sm track-hover" data-log="Composing Data Packet..."></textarea>
+                </div>
+                <button type="submit" class="neon-btn w-full py-4 rounded-sm font-bold tracking-widest brand-font text-sm track-hover" data-log="Command: Transmit Data">
+                    <i class="fas fa-paper-plane mr-2"></i> TRANSMIT DATA
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center border-t border-cyan-900 bg-[#020202] z-10 relative">
+        <div class="flex justify-center space-x-6 mb-6 md:hidden">
+            <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 transition-all"><i class="fab fa-github"></i></a>
+            <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 transition-all"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="w-10 h-10 glass-panel rounded-full flex items-center justify-center text-gray-400 hover:text-cyan-400 transition-all"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p class="text-gray-500 text-xs font-bold brand-font mb-2 tracking-widest">© 2026 SYS_ADMIN. ALL PROTOCOLS OBSERVED.</p>
+        <p class="text-cyan-900 text-[10px] font-mono flex items-center justify-center gap-2">
+            <i class="fas fa-lock"></i> CONNECTION SECURED VIA PORT 443
+        </p>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTopBtn" class="fixed bottom-6 right-6 w-10 h-10 bg-black border border-cyan-800 rounded text-cyan-600 flex justify-center items-center opacity-0 invisible transition-all duration-300 z-50 hover:bg-cyan-500 hover:text-black hover:shadow-[0_0_15px_#00f3ff] track-hover" data-log="Executing ScrollToTop Routine" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // --- 1. Terminal System Logger (NEW DETAILING) ---
+        class SystemLogger {
+            constructor() {
+                this.container = document.getElementById('log-container');
+                this.maxLogs = 6;
+            }
+            log(message, type = 'info') {
+                if(!this.container) return;
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                
+                let prefix = '>';
+                let colorClass = 'text-cyan-300';
+                
+                if(type === 'warn') { prefix = '[WARN]'; colorClass = 'text-yellow-400'; }
+                if(type === 'error') { prefix = '[ERR]'; colorClass = 'text-red-500'; }
+                if(type === 'success') { prefix = '[OK]'; colorClass = 'text-green-400'; }
+
+                div.innerHTML = `<span class="${colorClass}">${prefix} ${message}</span>`;
+                this.container.appendChild(div);
+
+                while(this.container.children.length > this.maxLogs) {
+                    this.container.removeChild(this.container.firstChild);
+                }
+                
+                // Auto scroll
+                this.container.parentElement.scrollTop = this.container.parentElement.scrollHeight;
+            }
+        }
+        const sysLogger = new SystemLogger();
+
+        // Attach hover events to actionable items to generate logs
+        document.querySelectorAll('.track-hover').forEach(el => {
+            el.addEventListener('mouseenter', function() {
+                const logMsg = this.getAttribute('data-log');
+                if(logMsg) sysLogger.log(logMsg);
+            });
+        });
+
+        // Log section scrolls
+        const sections = document.querySelectorAll('.scroll-section');
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.5 };
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    sysLogger.log(`Entering sector: ${entry.target.id.toUpperCase()}`);
+                }
+            });
+        }, observerOptions);
+        sections.forEach(sec => sectionObserver.observe(sec));
+
+
+        // --- 2. Mobile Menu Toggle ---
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if(mobileBtn) {
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                sysLogger.log("Mobile Nav Interface Toggled");
+            });
+            // Close menu on click
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => mobileMenu.classList.remove('active'));
+            });
+        }
+
+
+        // --- 3. Image Upload Logic ---
+        const uploadInput = document.getElementById('profile-upload');
+        const profilePic = document.getElementById('profile-pic');
+        if(uploadInput) {
+            uploadInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        profilePic.src = event.target.result;
+                        sysLogger.log("USER AVATAR DATA INJECTED SUCCESSFULLY.", "success");
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // --- 4. Typing Effect Logic ---
+        const textArray = ["Web Developer", "Cyber Enthusiast", "UI/UX Engineer", "System Architect"];
+        let textIndex = 0, charIndex = 0, isDeleting = false;
+        const typingElement = document.getElementById('typing-text');
+
+        function typeEffect() {
+            const currentWord = textArray[textIndex];
+            if (isDeleting) {
+                typingElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 30 : 100;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000; 
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % textArray.length;
+                typeSpeed = 500; 
+            }
+            setTimeout(typeEffect, typeSpeed);
+        }
+        setTimeout(typeEffect, 2000); // Start after boot
+
+        // --- 5. High-Tech Matrix Binary Canvas Background ---
+        const canvas = document.getElementById('binary-canvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        const chars = "01010101 0x2F 0xA4 SYSTEM DEV NET SEC < > [ ] { } // \\";
+        const charArray = chars.split('');
+        const fontSize = 12;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        function initDrops() {
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(3, 3, 3, 0.1)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = fontSize + 'px "Share Tech Mono"';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillStyle = Math.random() > 0.98 ? '#00f3ff' : '#003344';
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 40);
+
+        // --- 6. Custom Cursor Tracking ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX, posY = e.clientY;
+                cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`;
+                cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 150, fill: "forwards" }); 
+            });
+        }
+
+        // --- 7. System Boot Screen Animation (ENHANCED) ---
+        const bootScreen = document.getElementById('boot-screen');
+        const bootText = document.getElementById('boot-text');
+        const bootProgress = document.getElementById('boot-progress');
+        const bootBar = document.getElementById('boot-bar');
+        const bootPct = document.getElementById('boot-pct');
+        
+        const bootLines = [
+            "[OK] CPU ARCHITECTURE IDENTIFIED...",
+            "[OK] MEMORY ALLOCATED (128TB VIRTUAL)...",
+            "SYS_ADMIN: INITIALIZING KERNEL MODULES...",
+            "LOADING NEURAL NETWORKS... [OK]",
+            "MOUNTING ENCRYPTED FILESYSTEM... [OK]",
+            "ESTABLISHING SECURE PROTOCOLS (PORT 443)...",
+            "WARNING: ANOMALY DETECTED IN SECTOR 7G...",
+            "BYPASSING SECURITY PROTOCOLS... [SUCCESS]",
+            "ACCESS GRANTED. WELCOME USER."
+        ];
+        
+        let lineIndex = 0;
+        function showBootText() {
+            if (lineIndex < bootLines.length) {
+                let colorClass = "text-cyan-500";
+                if(bootLines[lineIndex].includes("WARNING")) colorClass = "text-yellow-400";
+                if(bootLines[lineIndex].includes("GRANTED")) colorClass = "text-green-400 font-bold";
+                
+                bootText.innerHTML += `<div class="${colorClass}">> ${bootLines[lineIndex]}</div>`;
+                lineIndex++;
+                
+                // Show progress bar midway
+                if(lineIndex === 4) {
+                    bootProgress.style.display = 'flex';
+                    animateProgressBar();
+                }
+
+                setTimeout(showBootText, Math.random() * 250 + 100); 
+            } else {
+                setTimeout(() => {
+                    bootScreen.style.transition = "opacity 0.8s ease-out, transform 0.8s ease-out";
+                    bootScreen.style.opacity = "0";
+                    bootScreen.style.transform = "scale(1.1)";
+                    setTimeout(() => {
+                        bootScreen.style.display = "none";
+                        checkCounters(); 
+                        sysLogger.log("System booted successfully.", "success");
+                    }, 800);
+                }, 1000);
+            }
+        }
+
+        function animateProgressBar() {
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) { clearInterval(interval); } 
+                else {
+                    width += Math.random() * 15;
+                    if(width > 100) width = 100;
+                    bootBar.style.width = width + '%';
+                    bootPct.innerText = Math.floor(width);
+                }
+            }, 100);
+        }
+
+        window.addEventListener('load', () => setTimeout(showBootText, 300));
+
+        // --- 8. Scroll Reveal ---
+        const reveals = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+        reveals.forEach(reveal => revealObserver.observe(reveal));
+
+        // --- 9. 3D Tilt Effect ---
+        const tiltCards = document.querySelectorAll('.tilt-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                const centerX = rect.width / 2, centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -6; 
+                const rotateY = ((x - centerX) / centerX) * 6;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                card.style.transition = `transform 0.5s ease`;
+            });
+            card.addEventListener('mouseenter', () => card.style.transition = `none`);
+        });
+
+        // --- 10. Live System Clock ---
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            const clockEl = document.getElementById('sys-clock');
+            if(clockEl) clockEl.innerText = timeStr;
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- 11. Scroll Controls ---
+        const scrollTopBtn = document.getElementById('scrollToTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) { scrollTopBtn.style.opacity = '1'; scrollTopBtn.style.visibility = 'visible'; } 
+            else { scrollTopBtn.style.opacity = '0'; scrollTopBtn.style.visibility = 'hidden'; }
+        });
+
+        // --- 12. Stats Counter Animation ---
+        const counters = document.querySelectorAll('.counter');
+        let hasCounted = false;
+        function checkCounters() {
+            if(hasCounted) return;
+            const statsSection = document.getElementById('stats');
+            if(!statsSection) return;
+            const rect = statsSection.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                hasCounted = true;
+                sysLogger.log("Processing statistical data blocks...");
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    const increment = target / (2000 / 16); 
+                    let current = 0;
+                    const updateCounter = () => {
+                        current += increment;
+                        if (current < target) {
+                            counter.innerText = Math.ceil(current);
+                            requestAnimationFrame(updateCounter);
+                        } else { counter.innerText = target; }
+                    };
+                    updateCounter();
+                });
+            }
+        }
+        window.addEventListener('scroll', checkCounters);
+
+    </script>
+</body>
+</html>
